@@ -64,6 +64,7 @@ final class ConduitAPI_differential_getcommitmessage_Method
       $fields = $request->getValue('fields', array());
       foreach ($fields as $field => $value) {
         $custom_field = idx($field_map, $field);
+
         if (!$custom_field) {
           // Just ignore this, these workflows don't make strong distictions
           // about field editability on the client side.
@@ -79,6 +80,7 @@ final class ConduitAPI_differential_getcommitmessage_Method
     $phids = array();
     foreach ($field_list->getFields() as $key => $field) {
       $field_phids = $field->getRequiredHandlePHIDsForCommitMessage();
+
       if (!is_array($field_phids)) {
         throw new Exception(
           pht(

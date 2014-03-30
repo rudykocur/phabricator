@@ -276,4 +276,12 @@ final class DifferentialJIRAIssuesField
     return true;
   }
 
+public function getRequiredHandlePHIDsForCommitMessage() {
+	return $this->getValue();
+}
+
+public function readValueFromCommitMessage($value) {
+	$this->setValue($value);
+}
+
 }
