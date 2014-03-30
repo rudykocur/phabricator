@@ -125,6 +125,30 @@
   padding-left: 38px;
 }
 
+.phui-timeline-token {
+  display: inline-block;
+}
+
+.phui-timeline-token.strikethrough {
+  position: relative;
+}
+
+.phui-timeline-token.strikethrough:before {
+  position: absolute;
+  content: "";
+  left: 0;
+  top: 50%;
+  right: 0;
+  border-top: 3px solid;
+  border-color: {$darkbluetext};
+
+  -webkit-transform:rotate(-40deg);
+  -moz-transform:rotate(-40deg);
+  -ms-transform:rotate(-40deg);
+  -o-transform:rotate(-40deg);
+  transform:rotate(-40deg);
+}
+
 .phui-timeline-major-event .phui-timeline-content
   .phui-timeline-core-content {
   padding: 16px 12px;

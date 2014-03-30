@@ -40,7 +40,7 @@ final class ManiphestTransactionEditor
         if ($this->getIsNewObject()) {
           return null;
         }
-        return (int)$object->getStatus();
+        return $object->getStatus();
       case ManiphestTransaction::TYPE_TITLE:
         if ($this->getIsNewObject()) {
           return null;
@@ -75,13 +75,13 @@ final class ManiphestTransactionEditor
 
     switch ($xaction->getTransactionType()) {
       case ManiphestTransaction::TYPE_PRIORITY:
-      case ManiphestTransaction::TYPE_STATUS:
         return (int)$xaction->getNewValue();
       case ManiphestTransaction::TYPE_CCS:
       case ManiphestTransaction::TYPE_PROJECTS:
         return array_values(array_unique($xaction->getNewValue()));
       case ManiphestTransaction::TYPE_OWNER:
         return nonempty($xaction->getNewValue(), null);
+      case ManiphestTransaction::TYPE_STATUS:
       case ManiphestTransaction::TYPE_TITLE:
       case ManiphestTransaction::TYPE_DESCRIPTION:
       case ManiphestTransaction::TYPE_ATTACH:
@@ -165,7 +165,8 @@ final class ManiphestTransactionEditor
         $data = $xaction->getNewValue();
         $new_sub = $this->getNextSubpriority(
           $data['newPriority'],
-          $data['newSubpriorityBase']);
+          $data['newSubpriorityBase'],
+          $data['direction']);
         $object->setSubpriority($new_sub);
         return;
       case ManiphestTransaction::TYPE_PROJECT_COLUMN:
@@ -441,26 +442,55 @@ final class ManiphestTransactionEditor
     return $copy;
   }
 
-  private function getNextSubpriority($pri, $sub) {
+  private function getNextSubpriority($pri, $sub, $dir = '>') {
+
+    switch ($dir) {
+      case '>':
+        $order = 'ASC';
+        break;
+      case '<':
+        $order = 'DESC';
+        break;
+      default:
+        throw new Exception('$dir must be ">" or "<".');
+        break;
+    }
+
+    if ($sub === null) {
+      $base = 0;
+    } else {
+      $base = $sub;
+    }
 
     if ($sub === null) {
       $next = id(new ManiphestTask())->loadOneWhere(
-        'priority = %d ORDER BY subpriority ASC LIMIT 1',
-        $pri);
+        'priority = %d ORDER BY subpriority %Q LIMIT 1',
+        $pri,
+        $order);
       if ($next) {
-        return $next->getSubpriority() - ((double)(2 << 16));
+        if ($dir == '>') {
+          return $next->getSubpriority() - ((double)(2 << 16));
+        } else {
+          return $next->getSubpriority() + ((double)(2 << 16));
+        }
       }
     } else {
       $next = id(new ManiphestTask())->loadOneWhere(
-        'priority = %d AND subpriority > %s ORDER BY subpriority ASC LIMIT 1',
+        'priority = %d AND subpriority %Q %f ORDER BY subpriority %Q LIMIT 1',
         $pri,
-        $sub);
+        $dir,
+        $sub,
+        $order);
       if ($next) {
         return ($sub + $next->getSubpriority()) / 2;
       }
     }
 
-    return (double)(2 << 32);
+    if ($dir == '>') {
+      return $base + (double)(2 << 32);
+    } else {
+      return $base - (double)(2 << 32);
+    }
   }
 
 }

@@ -762,7 +762,7 @@ abstract class PhabricatorBaseEnglishTranslation
       '%s added %d dependencie(s): %s.' => array(
         array(
           '%s added a dependency: %3$s',
-          '%s added a dependencies: %3$s',
+          '%s added dependencies: %3$s',
         ),
       ),
 
@@ -859,6 +859,20 @@ abstract class PhabricatorBaseEnglishTranslation
       '%s, %d line(s)' => array(
         '%s, %d line',
         '%s, %d lines',
+      ),
+
+      '%s pushed %d commit(s) to %s.' => array(
+        array(
+          array(
+            '%s pushed a commit to %3$s.',
+            '%s pushed %d commits to %s.',
+          ),
+        ),
+      ),
+
+      '%s commit(s)' => array(
+        '1 commit',
+        '%s commits',
       ),
 
     );
